@@ -3,7 +3,7 @@ version: 1
 vars:
   org: hlhd
   github_org: HomeLabHD
-  gitlab_group: PrPlanIT/HomeLabHD
+  gitlab_group: HomeLabHD
   repo: apt-cacher-ng
 
 sources:

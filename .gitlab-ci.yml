@@ -1,121 +1,115 @@
+# StageFreight GitLab CI skeleton
+# Behavior is configured in .stagefreight.yml, not here.
+# This file translates GitLab CI context into StageFreight's normalized contract.
+# ALL jobs always exist. StageFreight decides if they do work at runtime.
+
 stages:
+  - deps
   - build
   - security
-  - docs
   - release
+  - docs
 
 workflow:
   auto_cancel:
-    on_new_commit: interruptible
-  rules:
-    - if: '$CI_COMMIT_MESSAGE =~ /\[skip ci\]/'
-      when: never
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      when: always
+    on_new_commit: none
 
-build-image:
-  stage: build
-  image: docker.jcr.pcfae.com/prplanit/stagefreight:latest-dev
+.stagefreight-context: &sf-context
+  - export SF_CI_PROVIDER=gitlab
+  - export SF_CI_EVENT="${CI_PIPELINE_SOURCE}"
+  - export SF_CI_BRANCH="${CI_COMMIT_BRANCH}"
+  - export SF_CI_TAG="${CI_COMMIT_TAG}"
+  - export SF_CI_SHA="${CI_COMMIT_SHA}"
+  - export SF_CI_DEFAULT_BRANCH="${CI_DEFAULT_BRANCH}"
+  - export SF_CI_REPO_URL="${CI_PROJECT_URL}"
+  - export SF_CI_WORKSPACE="$PWD"
+  - export SF_CI_PIPELINE_ID="${CI_PIPELINE_ID}"
+
+.dind-setup: &dind-setup
+  - docker context create tls-context --docker "host=$DOCKER_HOST,ca=$DOCKER_CERT_PATH/ca.pem,cert=$DOCKER_CERT_PATH/cert.pem,key=$DOCKER_CERT_PATH/key.pem"
+  - docker buildx create --name sf-builder --use tls-context
+
+.dind-variables: &dind-variables
+  DOCKER_HOST: "tcp://docker:2376"
+  DOCKER_TLS_VERIFY: "1"
+  DOCKER_CERT_PATH: "/certs/client"
+  DOCKER_TLS_CERTDIR: "/certs"
+
+default:
+  image: docker.cr.pcfae.com/prplanit/stagefreight:latest-dev
   interruptible: true
   services:
-    - name: docker.jcr.pcfae.com/docker:27-dind
+    - name: docker.cr.pcfae.com/docker:27-dind
       alias: docker
   variables:
-    DOCKER_HOST: "tcp://docker:2376"
-    DOCKER_TLS_VERIFY: "1"
-    DOCKER_CERT_PATH: "/certs/client"
-    DOCKER_TLS_CERTDIR: "/certs"
+    <<: *dind-variables
+
+dependency-update:
+  stage: deps
+  variables:
+    GIT_DEPTH: 0
+    <<: *dind-variables
+  before_script:
+    - *sf-context
+    - *dind-setup
+  script:
+    - stagefreight ci run deps
   artifacts:
-    paths:
-      - .stagefreight/
+    paths: [.stagefreight/deps/]
+    expire_in: 1 week
+  allow_failure: true
+
+build:
+  stage: build
+  before_script:
+    - *sf-context
+    - *dind-setup
+  script:
+    - stagefreight ci run build
+  artifacts:
+    paths: [.stagefreight/]
     reports:
       junit: .stagefreight/reports/lint.xml
     expire_in: 2 hours
-  before_script:
-    - docker context create tls-context --docker "host=$DOCKER_HOST,ca=$DOCKER_CERT_PATH/ca.pem,cert=$DOCKER_CERT_PATH/cert.pem,key=$DOCKER_CERT_PATH/key.pem"
-    - docker buildx create --name stagefreight-builder --use tls-context
-  script:
-    - stagefreight docker build
-  rules:
-    - if: '$CI_COMMIT_TAG'
-      when: always
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: always
 
 security-scan:
   stage: security
-  image: docker.jcr.pcfae.com/prplanit/stagefreight:latest-dev
-  interruptible: true
-  needs: [build-image]
-  services:
-    - name: docker.jcr.pcfae.com/docker:27-dind
-      alias: docker
-  variables:
-    DOCKER_HOST: "tcp://docker:2376"
-    DOCKER_TLS_VERIFY: "1"
-    DOCKER_CERT_PATH: "/certs/client"
-    DOCKER_TLS_CERTDIR: "/certs"
-  artifacts:
-    paths:
-      - .stagefreight/security/
-    expire_in: 1 week
+  needs: [build]
   before_script:
-    - docker context create tls-context --docker "host=$DOCKER_HOST,ca=$DOCKER_CERT_PATH/ca.pem,cert=$DOCKER_CERT_PATH/cert.pem,key=$DOCKER_CERT_PATH/key.pem"
-    - docker buildx create --name security-scanner --use tls-context
+    - *sf-context
+    - *dind-setup
   script:
-    - stagefreight security scan --image "$SCAN_IMAGE" --output .stagefreight/security/
-  rules:
-    - if: '$CI_COMMIT_TAG'
-      variables:
-        SCAN_IMAGE: "docker.io/hlhd/apt-cacher-ng:$CI_COMMIT_TAG"
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      variables:
-        SCAN_IMAGE: "docker.io/hlhd/apt-cacher-ng:latest-dev"
-      when: on_success
-  allow_failure: true
-
-generate-docs:
-  stage: docs
-  image: docker.jcr.pcfae.com/prplanit/stagefreight:latest-dev
-  needs: [build-image]
-  variables:
-    GIT_DEPTH: 0
-    BUILD_STATUS: "passing"
-    BUILD_DATE: "$CI_COMMIT_TIMESTAMP"
-  script:
-    - stagefreight badge generate
-    - stagefreight narrator run
-    - stagefreight docker readme
-    - >
-      stagefreight commit
-      -t docs
-      -m "refresh generated docs and badges"
-      --add README.md
-      --add .stagefreight/badges
-      --skip-ci
-      --push
-  rules:
-    - if: '$CI_COMMIT_TAG'
-      when: on_success
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: on_success
+    - stagefreight ci run security
+  artifacts:
+    paths: [.stagefreight/security/]
+    expire_in: 1 week
   allow_failure: true
 
 create-release:
   stage: release
-  image: docker.jcr.pcfae.com/prplanit/stagefreight:latest-dev
+  needs:
+    - build
+    - security-scan
   variables:
     GIT_DEPTH: 0
-  needs:
-    - build-image
-    - job: security-scan
-      optional: true
-    - job: generate-docs
-      optional: true
+  before_script:
+    - *sf-context
   script:
-    - stagefreight release create --tag "$CI_COMMIT_TAG" --security-summary .stagefreight/security/ --registry-links
-  rules:
-    - if: '$CI_COMMIT_TAG'
-      when: on_success
+    - stagefreight ci run release
+  allow_failure: true
+
+generate-docs:
+  stage: docs
+  needs:
+    - build
+    - create-release
+  variables:
+    GIT_DEPTH: 0
+    BUILD_STATUS: "passing"
+    BUILD_DATE: "$CI_COMMIT_TIMESTAMP"
+  before_script:
+    - *sf-context
+  script:
+    - stagefreight ci run docs
+  when: always
   allow_failure: true
