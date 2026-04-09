@@ -32,6 +32,11 @@ RUN echo 'Acquire::HTTP::Proxy "http://172.17.0.1:3142";' >> /etc/apt/apt.conf.d
 | `PASS_THROUGH_PATTERN` | `.*` | Regex for pass-through requests |
 | `MAX_THREADS` | `20` | Max standby connection threads |
 | `NETWORK_TIMEOUT` | `60` | Network timeout in seconds |
+| `PRECACHE_FOR` | `` | Array of references in {} separated by , |
+| `USER_AGENT` | `` | Use a custom agent response |
+| `EX_THRESHOLD` | `4` | Num of days to keep unreferenced files |
+| `ADMIN_AUTH_USER` | `` | Admin Username |
+| `ADMIN_AUTH_PASS` | `` | Admin Password |
 
 ## Volumes
 
