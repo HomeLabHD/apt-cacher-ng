@@ -15,11 +15,25 @@ printf '%s\n' \
     "PassThroughPattern: ${PASS_THROUGH_PATTERN}" \
     "MaxStandbyConThreads: ${MAX_THREADS}" \
     "NetworkTimeout: ${NETWORK_TIMEOUT}" \
+    "ExThreshold: ${EX_THRESHOLD}" \
     "MaxConThreads: -1" \
     "VfileUseRangeOps: 1" \
     "ReuseConnections: 1" \
     "PipelineDepth: 10" \
     > /etc/apt-cacher-ng/zz_overrides.conf
+
+[ -z ${PRECACHE_FOR} ] || printf '%s\n' \
+    "PrecacheFor: ${PRECACHE_FOR}" \
+    >> /etc/apt-cacher-ng/zz_overrides.conf
+
+[ -z ${USER_AGENT} ] || printf '%s\n' \
+    "UserAgent: ${USER_AGENT}" \
+    >> /etc/apt-cacher-ng/zz_overrides.conf
+
+[ -z ${ADMIN_AUTH_USER} ] || [ -z ${ADMIN_AUTH_PASS} ] || printf '%s\n' \
+    "AdminAuth: ${ADMIN_AUTH_USER}:${ADMIN_AUTH_PASS}" \
+    > /etc/apt-cacher-ng/zz_overrides_security.conf
+
 
 # Pre-create log files to prevent race conditions
 touch "$LOG_DIR/apt-cacher.log" "$LOG_DIR/error.log"
