@@ -14,12 +14,12 @@ ENV DEBIAN_FRONTEND=noninteractive \
     APT_CACHER_NG_CACHE_DIR=/var/cache/apt-cacher-ng \
     APT_CACHER_NG_LOG_DIR=/var/log/apt-cacher-ng \
     APT_CACHER_NG_USER=apt-cacher-ng \
-    PASS_THROUGH_PATTERN='.*' \
-    PRECACHE_FOR='' \
-    USER_AGENT='' \
+    PASS_THROUGH_PATTERN=.* \
+    PRECACHE_FOR= \
+    USER_AGENT= \
     EX_THRESHOLD=4 \
-    ADMIN_AUTH_USER='' \
-    ADMIN_AUTH_PASS='' \
+    ADMIN_AUTH_USER= \
+    ADMIN_AUTH_PASS= \
     MAX_THREADS=20 \
     NETWORK_TIMEOUT=60
 
