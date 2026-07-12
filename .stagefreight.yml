@@ -6,17 +6,35 @@ vars:
   gitlab_group: HomeLabHD
   repo: apt-cacher-ng
 
-sources:
-  primary:
-    kind: git
-    worktree: "."
-    url: "https://gitlab.prplanit.com/{var:gitlab_group}/{var:repo}"
-    default_branch: "main"
+forges:
+  - id: gitlab
+    provider: gitlab
+    url: "https://gitlab.prplanit.com"
+    credentials: GITLAB
 
-policies:
-  git_tags:
-    stable: "^\\d+\\.\\d+\\.\\d+-\\d+-v\\d+$"
-    prerelease: "^\\d+\\.\\d+\\.\\d+-\\d+-v\\d+-.+"
+repos:
+  - id: primary
+    forge: gitlab
+    project: "{var:gitlab_group}/{var:repo}"
+    roles: [primary]
+    branches:
+      default: main
+    worktree: "."
+
+versioning:
+  tag_sources:
+    - id: stable
+      pattern: "^\\d+\\.\\d+\\.\\d+-\\d+-v\\d+$"
+    - id: prerelease
+      pattern: "^\\d+\\.\\d+\\.\\d+-\\d+-v\\d+-.+"
+  branch_builds:
+    - id: default
+      base_from: [stable]
+      format: "{base}-dev+{sha}"
+  no_lineage:
+    mode: error
+
+matchers:
   branches:
     main: "^main$"
 
@@ -84,231 +102,232 @@ targets:
     aliases: ["{version}", "latest"]
     when: { git_tags: [stable], events: [tag] }
 
-narrator:
-  - file: "README.md"
-    link_base: "https://github.com/{var:github_org}/{var:repo}/blob/main"
-    items:
-      # ── Project section (repo health & sources) ─────────────────
-      - id: project.github
-        kind: shield
-        placement:
-          between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
-          mode: replace
-          inline: true
-        shield: "badge/GitHub-source-181717?logo=github"
-        link: "https://github.com/{var:github_org}/{var:repo}"
+narrate:
+  patches:
+    - file: "README.md"
+      link_base: "https://github.com/{var:github_org}/{var:repo}/blob/main"
+      items:
+        # ── Project section (repo health & sources) ─────────────────
+        - id: project.github
+          kind: shield
+          placement:
+            between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
+            mode: replace
+            inline: true
+          shield: "badge/GitHub-source-181717?logo=github"
+          link: "https://github.com/{var:github_org}/{var:repo}"
 
-      - id: project.gitlab
-        kind: shield
-        placement:
-          between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
-          mode: replace
-          inline: true
-        shield: "badge/GitLab-source-FC6D26?logo=gitlab"
-        link: "https://gitlab.prplanit.com/{var:gitlab_group}/{var:repo}"
+        - id: project.gitlab
+          kind: shield
+          placement:
+            between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
+            mode: replace
+            inline: true
+          shield: "badge/GitLab-source-FC6D26?logo=gitlab"
+          link: "https://gitlab.prplanit.com/{var:gitlab_group}/{var:repo}"
 
-      - id: project.last-commit
-        kind: props
-        type: github-last-commit
-        placement:
-          between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
-          mode: replace
-          inline: true
-        params:
-          repo: "{var:github_org}/{var:repo}"
+        - id: project.last-commit
+          kind: props
+          type: github-last-commit
+          placement:
+            between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
+            mode: replace
+            inline: true
+          params:
+            repo: "{var:github_org}/{var:repo}"
 
-      - id: project.issues-open
-        kind: props
-        type: github-issues-open
-        placement:
-          between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
-          mode: replace
-          inline: true
-        params:
-          repo: "{var:github_org}/{var:repo}"
+        - id: project.issues-open
+          kind: props
+          type: github-issues-open
+          placement:
+            between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
+            mode: replace
+            inline: true
+          params:
+            repo: "{var:github_org}/{var:repo}"
 
-      - id: project.prs-open
-        kind: shield
-        placement:
-          between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
-          mode: replace
-          inline: true
-        shield: "github/issues-pr/{var:github_org}/{var:repo}"
+        - id: project.prs-open
+          kind: shield
+          placement:
+            between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
+            mode: replace
+            inline: true
+          shield: "github/issues-pr/{var:github_org}/{var:repo}"
 
-      - id: project.contributors
-        kind: props
-        type: github-contributors
-        placement:
-          between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
-          mode: replace
-          inline: true
-        params:
-          repo: "{var:github_org}/{var:repo}"
+        - id: project.contributors
+          kind: props
+          type: github-contributors
+          placement:
+            between: ["<!-- sf:project:start -->", "<!-- sf:project:end -->"]
+            mode: replace
+            inline: true
+          params:
+            repo: "{var:github_org}/{var:repo}"
 
-      # ── Status badges ───────────────────────────────────────────
-      - id: badge.build
-        kind: badge
-        placement:
-          between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
-          mode: replace
-          inline: true
-        text: build
-        value: "{env:BUILD_STATUS}"
-        color: auto
-        font: monofur
-        output: ".stagefreight/badges/build.svg"
-        link: "https://gitlab.prplanit.com/{var:gitlab_group}/{var:repo}/-/pipelines"
+        # ── Status badges ───────────────────────────────────────────
+        - id: badge.build
+          kind: badge
+          placement:
+            between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
+            mode: replace
+            inline: true
+          text: build
+          value: "{env:BUILD_STATUS}"
+          color: auto
+          font: monofur
+          output: ".stagefreight/badges/build.svg"
+          link: "https://gitlab.prplanit.com/{var:gitlab_group}/{var:repo}/-/pipelines"
 
-      - id: badge.license
-        kind: badge
-        placement:
-          between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
-          mode: replace
-          inline: true
-        text: license
-        value: "BSD-4-Clause"
-        color: "#310937"
-        font: monofur
-        output: ".stagefreight/badges/license.svg"
-        link: "https://metadata.ftp-master.debian.org/changelogs//main/a/apt-cacher-ng/apt-cacher-ng_3.7.5-1.1_copyright"
+        - id: badge.license
+          kind: badge
+          placement:
+            between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
+            mode: replace
+            inline: true
+          text: license
+          value: "BSD-4-Clause"
+          color: "#310937"
+          font: monofur
+          output: ".stagefreight/badges/license.svg"
+          link: "https://metadata.ftp-master.debian.org/changelogs//main/a/apt-cacher-ng/apt-cacher-ng_3.7.5-1.1_copyright"
 
-      - id: badge.release
-        kind: badge
-        placement:
-          between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
-          mode: replace
-          inline: true
-        text: release
-        value: "v{base}"
-        color: "#74ecbe"
-        font: dejavu-sans
-        font_size: 11
-        output: ".stagefreight/badges/release.svg"
-        link: "https://github.com/{var:github_org}/{var:repo}/releases"
+        - id: badge.release
+          kind: badge
+          placement:
+            between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
+            mode: replace
+            inline: true
+          text: release
+          value: "v{base}"
+          color: "#74ecbe"
+          font: dejavu-sans
+          font_size: 11
+          output: ".stagefreight/badges/release.svg"
+          link: "https://github.com/{var:github_org}/{var:repo}/releases"
 
-      - id: badge.updated
-        kind: badge
-        placement:
-          between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
-          mode: replace
-          inline: true
-        text: updated
-        value: "{env:BUILD_DATE}"
-        color: "#236144"
-        font: dejavu-sans
-        font_size: 11
-        output: ".stagefreight/badges/updated.svg"
+        - id: badge.updated
+          kind: badge
+          placement:
+            between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
+            mode: replace
+            inline: true
+          text: updated
+          value: "{env:BUILD_DATE}"
+          color: "#236144"
+          font: dejavu-sans
+          font_size: 11
+          output: ".stagefreight/badges/updated.svg"
 
-      - id: shield.donate
-        kind: shield
-        placement:
-          between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
-          mode: replace
-          inline: true
-        shield: "badge/donate-FF5E5B?logo=ko-fi&logoColor=white"
-        link: "https://ko-fi.com/T6T41IT163"
+        - id: shield.donate
+          kind: shield
+          placement:
+            between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
+            mode: replace
+            inline: true
+          shield: "badge/donate-FF5E5B?logo=ko-fi&logoColor=white"
+          link: "https://ko-fi.com/T6T41IT163"
 
-      - id: shield.sponsor
-        kind: shield
-        placement:
-          between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
-          mode: replace
-          inline: true
-        shield: "badge/sponsor-EA4AAA?logo=githubsponsors&logoColor=white"
-        link: "https://github.com/sponsors/{var:github_org}"
+        - id: shield.sponsor
+          kind: shield
+          placement:
+            between: ["<!-- sf:badges:start -->", "<!-- sf:badges:end -->"]
+            mode: replace
+            inline: true
+          shield: "badge/sponsor-EA4AAA?logo=githubsponsors&logoColor=white"
+          link: "https://github.com/sponsors/{var:github_org}"
 
-      # ── Image section ───────────────────────────────────────────
-      # Row 1: Docker image + pulls
-      - id: image.docker
-        kind: shield
-        placement:
-          between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
-          mode: replace
-        shield: "badge/Docker-{var:org}%2F{var:repo}-2496ED?logo=docker&logoColor=white"
-        link: "https://hub.docker.com/r/{var:org}/{var:repo}"
+        # ── Image section ───────────────────────────────────────────
+        # Row 1: Docker image + pulls
+        - id: image.docker
+          kind: shield
+          placement:
+            between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
+            mode: replace
+          shield: "badge/Docker-{var:org}%2F{var:repo}-2496ED?logo=docker&logoColor=white"
+          link: "https://hub.docker.com/r/{var:org}/{var:repo}"
 
-      - id: image.pulls
-        kind: badge
-        placement:
-          between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
-          mode: replace
-        text: pulls
-        value: "{docker.pulls}"
-        color: "#1d63ed"
-        output: ".stagefreight/badges/pulls.svg"
-        link: "https://hub.docker.com/r/{var:org}/{var:repo}"
+        - id: image.pulls
+          kind: badge
+          placement:
+            between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
+            mode: replace
+          text: pulls
+          value: "{docker.pulls}"
+          color: "#1d63ed"
+          output: ".stagefreight/badges/pulls.svg"
+          link: "https://hub.docker.com/r/{var:org}/{var:repo}"
 
-      - id: image.break1
-        kind: break
-        placement:
-          between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
-          mode: replace
+        - id: image.break1
+          kind: break
+          placement:
+            between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
+            mode: replace
 
-      # Row 2: All tag badges (release + dev)
-      - id: image.release-latest
-        kind: badge
-        placement:
-          between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
-          mode: replace
-        text: latest
-        value: "v{base}"
-        color: "#74ecbe"
-        output: ".stagefreight/badges/latest.svg"
-        link: "https://hub.docker.com/r/{var:org}/{var:repo}/tags?name=latest"
+        # Row 2: All tag badges (release + dev)
+        - id: image.release-latest
+          kind: badge
+          placement:
+            between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
+            mode: replace
+          text: latest
+          value: "v{base}"
+          color: "#74ecbe"
+          output: ".stagefreight/badges/latest.svg"
+          link: "https://hub.docker.com/r/{var:org}/{var:repo}/tags?name=latest"
 
-      - id: image.release-updated
-        kind: badge
-        placement:
-          between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
-          mode: replace
-        text: updated
-        value: "{docker.tag.v{base}.updated}"
-        color: "#236144"
-        output: ".stagefreight/badges/release-updated.svg"
+        - id: image.release-updated
+          kind: badge
+          placement:
+            between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
+            mode: replace
+          text: updated
+          value: "{docker.tag.v{base}.updated}"
+          color: "#236144"
+          output: ".stagefreight/badges/release-updated.svg"
 
-      - id: image.release-size
-        kind: badge
-        placement:
-          between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
-          mode: replace
-        text: size
-        value: "{docker.tag.v{base}.size}"
-        color: "#555"
-        output: ".stagefreight/badges/release-size.svg"
-        link: "https://hub.docker.com/r/{var:org}/{var:repo}/tags?name=v{base}"
+        - id: image.release-size
+          kind: badge
+          placement:
+            between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
+            mode: replace
+          text: size
+          value: "{docker.tag.v{base}.size}"
+          color: "#555"
+          output: ".stagefreight/badges/release-size.svg"
+          link: "https://hub.docker.com/r/{var:org}/{var:repo}/tags?name=v{base}"
 
-      # Dev badges (same row)
-      - id: image.dev-latest
-        kind: badge
-        placement:
-          between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
-          mode: replace
-        text: latest-dev
-        value: "dev-{sha:8}"
-        color: "#3b82f6"
-        output: ".stagefreight/badges/latest-dev.svg"
-        link: "https://hub.docker.com/r/{var:org}/{var:repo}/tags?name=latest-dev"
+        # Dev badges (same row)
+        - id: image.dev-latest
+          kind: badge
+          placement:
+            between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
+            mode: replace
+          text: latest-dev
+          value: "dev-{sha:8}"
+          color: "#3b82f6"
+          output: ".stagefreight/badges/latest-dev.svg"
+          link: "https://hub.docker.com/r/{var:org}/{var:repo}/tags?name=latest-dev"
 
-      - id: image.dev-updated
-        kind: badge
-        placement:
-          between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
-          mode: replace
-        text: updated
-        value: "{docker.tag.latest-dev.updated}"
-        color: "#236144"
-        output: ".stagefreight/badges/dev-updated.svg"
+        - id: image.dev-updated
+          kind: badge
+          placement:
+            between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
+            mode: replace
+          text: updated
+          value: "{docker.tag.latest-dev.updated}"
+          color: "#236144"
+          output: ".stagefreight/badges/dev-updated.svg"
 
-      - id: image.dev-size
-        kind: badge
-        placement:
-          between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
-          mode: replace
-        text: size
-        value: "{docker.tag.latest-dev.size}"
-        color: "#555"
-        output: ".stagefreight/badges/dev-size.svg"
-        link: "https://hub.docker.com/r/{var:org}/{var:repo}/tags?name=latest-dev"
+        - id: image.dev-size
+          kind: badge
+          placement:
+            between: ["<!-- sf:image:start -->", "<!-- sf:image:end -->"]
+            mode: replace
+          text: size
+          value: "{docker.tag.latest-dev.size}"
+          color: "#555"
+          output: ".stagefreight/badges/dev-size.svg"
+          link: "https://hub.docker.com/r/{var:org}/{var:repo}/tags?name=latest-dev"
 
 lint:
   level: full
