@@ -1,5 +1,8 @@
 version: 1
 
+ci:
+  image: docker.cr.pcfae.com/prplanit/stagefreight:latest-dev
+
 vars:
   org: hlhd
   github_org: HomeLabHD
