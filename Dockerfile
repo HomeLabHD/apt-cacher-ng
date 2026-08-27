@@ -14,15 +14,16 @@ ENV DEBIAN_FRONTEND=noninteractive \
     APT_CACHER_NG_CACHE_DIR=/var/cache/apt-cacher-ng \
     APT_CACHER_NG_LOG_DIR=/var/log/apt-cacher-ng \
     APT_CACHER_NG_USER=apt-cacher-ng \
-    PASS_THROUGH_PATTERN=.* \
+    PASS_THROUGH_PATTERN='.*' \
     PRECACHE_FOR= \
     USER_AGENT= \
     EX_THRESHOLD=4 \
     ADMIN_AUTH_USER= \
     ADMIN_AUTH_PASS= \
+    ADMIN_AUTH_USER_FILE= \
+    ADMIN_AUTH_PASS_FILE= \
     MAX_THREADS=20 \
     NETWORK_TIMEOUT=60
-
 
 # Install apt-cacher-ng and runtime dependencies (no wget/curl/gosu — smaller attack surface)
 RUN apt-get update && apt-get install -y --no-install-recommends \

@@ -37,6 +37,14 @@ RUN echo 'Acquire::HTTP::Proxy "http://172.17.0.1:3142";' >> /etc/apt/apt.conf.d
 | `EX_THRESHOLD` | `4` | Num of days to keep unreferenced files |
 | `ADMIN_AUTH_USER` | `` | Admin Username |
 | `ADMIN_AUTH_PASS` | `` | Admin Password |
+| `ADMIN_AUTH_USER_FILE` | `` | Path to a file holding the admin username (takes precedence) |
+| `ADMIN_AUTH_PASS_FILE` | `` | Path to a file holding the admin password (takes precedence) |
+
+Credentials passed as `ADMIN_AUTH_USER` / `ADMIN_AUTH_PASS` are visible to anyone who can
+run `docker inspect` or read `/proc/<pid>/environ`. Prefer the `_FILE` variants with a
+docker/compose secret or a Kubernetes projected volume. If a `_FILE` path is set but not
+readable the container refuses to start, rather than silently coming up with an
+unauthenticated admin interface.
 
 ## Volumes
 
