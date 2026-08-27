@@ -54,7 +54,7 @@ docker build -t hlhd/apt-cacher-ng .
 
 ## Credits
 
-* Based on [Apt-Cacher NG](https://www.unix-ag.uni-kl.de/~bloch/acng/), the caching proxy for Linux package archives
+* Based on [Apt-Cacher NG](https://www.unix-ag.uni-kl.de/~bloch/acng/) by Eduard Bloch, the caching proxy for Linux package archives — [source](https://salsa.debian.org/blade/apt-cacher-ng) · [BSD-4-Clause](LICENSE)
 * Inspired by [sameersbn/docker-apt-cacher-ng](https://github.com/sameersbn/docker-apt-cacher-ng) — I struggled to find an image with working logs, so I made one
 
 ## Disclaimer
