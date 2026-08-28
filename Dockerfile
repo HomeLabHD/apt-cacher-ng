@@ -10,7 +10,7 @@ LABEL maintainer="HomeLabHD <homelabhelp@gmail.com>" \
     org.opencontainers.image.vendor="HomeLabHD"
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    APT_CACHER_NG_VERSION=3.7.5 \
+    APT_CACHER_NG_VERSION=3.7.5-1 \
     APT_CACHER_NG_CACHE_DIR=/var/cache/apt-cacher-ng \
     APT_CACHER_NG_LOG_DIR=/var/log/apt-cacher-ng \
     APT_CACHER_NG_USER=apt-cacher-ng \
@@ -43,12 +43,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     UNBUFFER_LOGS=
 
 # Install apt-cacher-ng and runtime dependencies (no wget/curl/gosu — smaller attack surface)
-# The pin is the UPSTREAM version; the trailing -* follows whatever Debian revision is
-# current at build time (3.7.5-1, a later -2, a +debNuN security update). Pinning the
-# full revision froze the image out of Debian's own security patches for the same
-# upstream release, which is the whole point of rebuilding.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      "apt-cacher-ng=${APT_CACHER_NG_VERSION}-*" ca-certificates tini \
+      apt-cacher-ng="${APT_CACHER_NG_VERSION}" ca-certificates tini \
  && rm -rf /var/lib/apt/lists/*
 
 # Override defaults — last value wins, no need to patch acng.conf
