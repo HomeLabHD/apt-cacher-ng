@@ -23,7 +23,24 @@ ENV DEBIAN_FRONTEND=noninteractive \
     ADMIN_AUTH_USER_FILE= \
     ADMIN_AUTH_PASS_FILE= \
     MAX_THREADS=20 \
-    NETWORK_TIMEOUT=60
+    NETWORK_TIMEOUT=60 \
+    PORT= \
+    BIND_ADDRESS= \
+    RESERVE_SPACE= \
+    KEEP_EXTRA_VERSIONS= \
+    PROXY= \
+    OFFLINE_MODE= \
+    DONT_CACHE= \
+    DONT_CACHE_REQUESTED= \
+    DONT_CACHE_RESOLVED= \
+    MAX_DL_SPEED= \
+    LOCAL_DIRS= \
+    REPORT_PAGE= \
+    EXPOSE_ORIGIN= \
+    DEBUG= \
+    VERBOSE= \
+    VERBOSE_LOG= \
+    UNBUFFER_LOGS=
 
 # Install apt-cacher-ng and runtime dependencies (no wget/curl/gosu — smaller attack surface)
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -48,8 +65,10 @@ RUN chmod +x /sbin/entrypoint.sh
 
 EXPOSE 3142/tcp
 
+# Port is read from the file the entrypoint derives it into, so a custom PORT stays
+# healthy; the literal 0C46 (3142) is only the pre-start fallback.
 HEALTHCHECK --interval=10s --timeout=2s --retries=3 \
-    CMD grep -q ":0C46" /proc/net/tcp 2>/dev/null || exit 1
+    CMD grep -q ":$(cat /run/apt-cacher-ng/port.hex 2>/dev/null || echo 0C46) " /proc/net/tcp 2>/dev/null || exit 1
 
 ENTRYPOINT ["/usr/bin/tini", "-s", "--", "/sbin/entrypoint.sh"]
 CMD []

@@ -39,6 +39,28 @@ RUN echo 'Acquire::HTTP::Proxy "http://172.17.0.1:3142";' >> /etc/apt/apt.conf.d
 | `ADMIN_AUTH_PASS` | `` | Admin Password |
 | `ADMIN_AUTH_USER_FILE` | `` | Path to a file holding the admin username (takes precedence) |
 | `ADMIN_AUTH_PASS_FILE` | `` | Path to a file holding the admin password (takes precedence) |
+| `PORT` | `3142` | Listen port (the healthcheck follows it automatically) |
+| `BIND_ADDRESS` | *(all)* | Interface(s) to bind, space-separated |
+| `RESERVE_SPACE` | `1048576` | Disk space to keep free, in **bytes** (no `M`/`G` suffix) |
+| `KEEP_EXTRA_VERSIONS` | *(acng default)* | Old package versions to retain per package |
+| `PROXY` | `` | Upstream proxy, e.g. `http://proxy:3128` |
+| `OFFLINE_MODE` | `0` | `1` serves only what is already cached |
+| `DONT_CACHE` | `` | Regex of URLs never cached |
+| `DONT_CACHE_REQUESTED` | `` | Regex matched against the requested URL |
+| `DONT_CACHE_RESOLVED` | `` | Regex matched after redirect resolution |
+| `MAX_DL_SPEED` | *(unlimited)* | Download rate cap in KiB/s (integer) |
+| `LOCAL_DIRS` | `` | Extra local directories to serve |
+| `REPORT_PAGE` | `acng-report.html` | Path of the status/report page |
+| `EXPOSE_ORIGIN` | `0` | `1` forwards the client IP upstream via `X-Forwarded-For` |
+| `DEBUG` | `0` | Debug bitmask |
+| `VERBOSE` | `0` | Verbose console output |
+| `VERBOSE_LOG` | `0` | Verbose transfer logging |
+| `UNBUFFER_LOGS` | `0` | Flush log writes immediately |
+
+Every variable above maps to the apt-cacher-ng directive of the same name in CamelCase
+(`PASS_THROUGH_PATTERN` → `PassThroughPattern`), so upstream's documentation applies
+directly. Unset optional variables are omitted from the generated config rather than
+written empty, leaving apt-cacher-ng's own default in force.
 
 Credentials passed as `ADMIN_AUTH_USER` / `ADMIN_AUTH_PASS` are visible to anyone who can
 run `docker inspect` or read `/proc/<pid>/environ`. Prefer the `_FILE` variants with a
