@@ -8,12 +8,6 @@
 # ------------------------------------------------------------------------------
 
 version: 1
-vars:
-  github_org: HomeLabHD
-  github_repo: apt-cacher-ng
-  gitlab_group: HomeLabHD
-  org: hlhd
-  repo: apt-cacher-ng
 builds:
   preset: https://gitlab.prplanit.com/PrPlanIT/MaintenancePolicy//preset/build-docker.yml
 scribe:
