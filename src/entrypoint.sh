@@ -40,6 +40,8 @@ emit_opt() {
     printf '%s: %s\n' "$1" "$2" >> "$OVERRIDES"
 }
 
+emit_opt DnsCacheSeconds    "${DNS_CACHE_SECONDS}"
+emit_opt ConnectProto       "${CONNECT_PROTO}"
 emit_opt PrecacheFor        "${PRECACHE_FOR}"
 emit_opt UserAgent          "${USER_AGENT}"
 emit_opt Port               "${PORT}"
