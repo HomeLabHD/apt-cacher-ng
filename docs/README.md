@@ -2,7 +2,7 @@
 
 | Guide | Description |
 |-------|-------------|
-| [Docker](docker/) | Docker run, Compose, and building from source |
+| [Docker](docker/) | Installation, Docker run, Compose, and building from source |
 | [Kubernetes](k8s/) | Pod and Service manifests |
 
 ## Client Configuration

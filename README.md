@@ -14,6 +14,14 @@ A caching proxy for Debian-based package downloads (e.g., APT). This image is id
 [![latest](https://raw.githubusercontent.com/HomeLabHD/apt-cacher-ng/main/.stagefreight/scribe/release-latest.svg)](https://github.com/HomeLabHD/apt-cacher-ng/pkgs/container/apt-cacher-ng) ![updated](https://raw.githubusercontent.com/HomeLabHD/apt-cacher-ng/main/.stagefreight/scribe/release-updated.svg) [![size](https://raw.githubusercontent.com/HomeLabHD/apt-cacher-ng/main/.stagefreight/scribe/release-size.svg)](https://github.com/HomeLabHD/apt-cacher-ng/pkgs/container/apt-cacher-ng) [![latest-dev](https://raw.githubusercontent.com/HomeLabHD/apt-cacher-ng/main/.stagefreight/scribe/dev-latest.svg)](https://github.com/HomeLabHD/apt-cacher-ng/pkgs/container/apt-cacher-ng) ![updated](https://raw.githubusercontent.com/HomeLabHD/apt-cacher-ng/main/.stagefreight/scribe/dev-updated.svg) [![size](https://raw.githubusercontent.com/HomeLabHD/apt-cacher-ng/main/.stagefreight/scribe/dev-size.svg)](https://github.com/HomeLabHD/apt-cacher-ng/pkgs/container/apt-cacher-ng)
 <!-- sf:image:end -->
 
+### Documentation
+
+| Guide | Covers |
+|-------|--------|
+| [Usage](docs/README.md) | Client configuration, environment variables, volumes, logs and maintenance |
+| [Docker](docs/docker/README.md) | Installation, Docker run, Compose, and building from source |
+| [Kubernetes](docs/k8s/README.md) | Pod and Service manifests |
+
 ### Features
 
 |                          |                                                                    |
@@ -24,29 +32,7 @@ A caching proxy for Debian-based package downloads (e.g., APT). This image is id
 | **Health Checks**        | Built-in HTTP health check against the report page                 |
 | **Tini Init**            | Proper signal handling and zombie reaping via tini                  |
 
-### Documentation
-
-| Topic | |
-|-------|-|
-| [Usage](docs/README.md) | Running the image, client configuration, and maintenance |
-| [Docker](docs/docker/) | [docker-compose.yaml](docs/docker/docker-compose.yaml) |
-| [Kubernetes](docs/k8s/) | [pod.yaml](docs/k8s/pod.yaml) · [service.yaml](docs/k8s/service.yaml) |
-
 ---
-
-## Installation
-
-Pull the image from [Docker Hub](https://hub.docker.com/r/hlhd/apt-cacher-ng) or build it yourself:
-
-```bash
-docker pull docker.io/hlhd/apt-cacher-ng:latest
-```
-
-```bash
-git clone https://github.com/HomeLabHD/apt-cacher-ng
-cd apt-cacher-ng
-docker build -t hlhd/apt-cacher-ng .
-```
 
 ## Contributing
 

@@ -1,5 +1,15 @@
 # Docker Deployment
 
+## Installation
+
+Pull the image from [Docker Hub](https://hub.docker.com/r/hlhd/apt-cacher-ng):
+
+```bash
+docker pull docker.io/hlhd/apt-cacher-ng:latest
+```
+
+or build it yourself (see [Building from Source](#building-from-source)).
+
 ## Quick Start
 
 ```bash
