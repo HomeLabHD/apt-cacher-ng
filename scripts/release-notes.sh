@@ -30,14 +30,14 @@ ${NOTABLE_CHANGES}
 
 ## Installation
 
-For installation and usage instructions, please refer to the [README](https://gitlab.prplanit.com/precisionplanit/apt-cacher-ng-oci/-/blob/${RELEASE}/README.md)
+For installation and usage instructions, please refer to the [README](https://git.optcp.com/precisionplanit/apt-cacher-ng-oci/-/blob/${RELEASE}/README.md)
 
 ## Contributing
 
 If you find this image useful, you can help:
 
 - Submit a Merge Request with new features or fixes
-- Report bugs or issues on [GitLab Issues](https://gitlab.prplanit.com/precisionplanit/apt-cacher-ng-oci/-/issues)
+- Report bugs or issues on [GitLab Issues](https://git.optcp.com/precisionplanit/apt-cacher-ng-oci/-/issues)
 
 ## Changelog
 
