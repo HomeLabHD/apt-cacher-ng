@@ -80,6 +80,8 @@ repos:
     roles:
       - primary
     worktree: .
+schedules:
+  preset: https://git.optcp.com/PrPlanIT/MaintenancePolicy//preset/schedules-upstream.yml
 stencils:
   presets:
     - https://git.optcp.com/PrPlanIT/MaintenancePolicy//preset/stencils-base.yml
@@ -90,3 +92,19 @@ toolchains:
   want:
     presets:
       - https://git.optcp.com/PrPlanIT/MaintenancePolicy//preset/toolchains-scanners.yml
+upstream:
+  evidence:
+    image:
+      probe:
+        manager: dpkg
+        package: apt-cacher-ng
+  sources:
+    apt-cacher-ng:
+      apt: apt-cacher-ng
+      pins:
+        - arg: APT_CACHER_NG_VERSION
+          file: Dockerfile
+      suite: trixie/main
+  version:
+    since: v3.7.5
+    track: apt-cacher-ng
