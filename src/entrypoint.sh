@@ -24,7 +24,7 @@ printf '%s\n' \
     "NetworkTimeout: ${NETWORK_TIMEOUT}" \
     "ExThreshold: ${EX_THRESHOLD}" \
     "MaxConThreads: -1" \
-    "VfileUseRangeOps: 1" \
+    "VfileUseRangeOps: ${VFILE_USE_RANGE_OPS}" \
     "ReuseConnections: 1" \
     "PipelineDepth: 10" \
     > "$OVERRIDES"

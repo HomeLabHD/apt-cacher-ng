@@ -32,6 +32,7 @@ RUN echo 'Acquire::HTTP::Proxy "http://172.17.0.1:3142";' >> /etc/apt/apt.conf.d
 | `PASS_THROUGH_PATTERN` | `.*` | Regex for pass-through requests |
 | `MAX_THREADS` | `20` | Max standby connection threads |
 | `NETWORK_TIMEOUT` | `60` | Network timeout in seconds |
+| `VFILE_USE_RANGE_OPS` | `1` | `0` fetches volatile index files (`InRelease`, `Packages`) whole instead of resuming them with range requests, which can splice two upstream versions into a BADSIG file |
 | `DNS_CACHE_SECONDS` | *(acng default, 1800)* | Lifetime of acng's internal DNS cache; `-1` disables it, so every connection resolves afresh |
 | `CONNECT_PROTO` | *(system order)* | IP families for upstream connections, in order: `v4 v6`, `v6 v4`, `v4` or `v6` |
 | `PRECACHE_FOR` | `` | Array of references in {} separated by , |
