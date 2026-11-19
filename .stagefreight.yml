@@ -39,7 +39,6 @@ metadata:
   description:
     - Caching proxy for Debian and Ubuntu package downloads.
     - Rootless apt-cacher-ng container that caches APT package downloads to cut bandwidth and speed up repeat installs across CI pipelines and homelab networks, with container log streaming, runtime tuning, init-managed volume ownership, and an HTTP health check.
-  license: BSD-4-Clause
   org: HomeLabHD
   title: APT Cacher NG
   topics:
@@ -93,10 +92,6 @@ toolchains:
     presets:
       - https://git.optcp.com/PrPlanIT/MaintenancePolicy//preset/toolchains-scanners.yml
 upstream:
-  evidence:
-    image:
-      manager: dpkg
-      package: apt-cacher-ng
   sources:
     apt-cacher-ng:
       apt: apt-cacher-ng
