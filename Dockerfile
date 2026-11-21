@@ -10,6 +10,7 @@ LABEL maintainer="HomeLabHD <homelabhelp@gmail.com>" \
     org.opencontainers.image.vendor="HomeLabHD"
 
 ENV DEBIAN_FRONTEND=noninteractive \
+    # renovate: datasource=deb depName=apt-cacher-ng registryUrl=https://deb.debian.org/debian?suite=trixie&components=main
     APT_CACHER_NG_VERSION=3.7.5-1 \
     APT_CACHER_NG_CACHE_DIR=/var/cache/apt-cacher-ng \
     APT_CACHER_NG_LOG_DIR=/var/log/apt-cacher-ng \
@@ -18,8 +19,6 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PRECACHE_FOR= \
     USER_AGENT= \
     EX_THRESHOLD=4 \
-    ADMIN_AUTH_USER= \
-    ADMIN_AUTH_PASS= \
     ADMIN_AUTH_USER_FILE= \
     ADMIN_AUTH_PASS_FILE= \
     MAX_THREADS=20 \
