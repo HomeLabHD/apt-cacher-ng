@@ -92,13 +92,6 @@ toolchains:
     presets:
       - https://git.optcp.com/PrPlanIT/MaintenancePolicy//preset/toolchains-scanners.yml
 upstream:
-  sources:
-    apt-cacher-ng:
-      apt: apt-cacher-ng
-      pins:
-        - arg: APT_CACHER_NG_VERSION
-          file: Dockerfile
-      suite: trixie/main
   version:
     since: v3.7.5
     track: apt-cacher-ng
